@@ -9,6 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -77,6 +78,14 @@ public class JdbcUserDao implements UserDao {
         }
 
         return true;
+    }
+
+    @Override
+    public BigDecimal getAccountBalance (int userId){
+       String sql = "SELECT balance " +
+                "FROM account " +
+                "WHERE user_id = ?;";
+       return jdbcTemplate.queryForObject(sql, BigDecimal.class, userId);
     }
 
     private User mapRowToUser(SqlRowSet rs) {
