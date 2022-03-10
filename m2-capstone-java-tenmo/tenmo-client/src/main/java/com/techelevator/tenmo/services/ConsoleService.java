@@ -1,9 +1,11 @@
 package com.techelevator.tenmo.services;
 
 
+import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Scanner;
 
 public class ConsoleService {
@@ -82,6 +84,15 @@ public class ConsoleService {
     public void pause() {
         System.out.println("\nPress Enter to continue...");
         scanner.nextLine();
+    }
+    public void printUsers(List<User> incomingList, Long logInId){
+        for(User currentUser : incomingList) {
+            if(currentUser.getId() != logInId) {
+                System.out.println(currentUser.getId());
+                System.out.println(currentUser.getUsername());
+            }
+            System.out.println("Please enter the user_name of the person you'd like to transfer funds to.");
+        }
     }
 
     public void printErrorMessage() {

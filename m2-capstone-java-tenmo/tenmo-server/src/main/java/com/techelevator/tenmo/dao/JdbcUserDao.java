@@ -1,5 +1,6 @@
 package com.techelevator.tenmo.dao;
 
+import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.User;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -9,6 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,6 +80,28 @@ public class JdbcUserDao implements UserDao {
 
         return true;
     }
+
+    @Override
+    public BigDecimal getAccountBalance (int userId){
+       String sql = "SELECT balance " +
+                "FROM account " +
+                "WHERE user_id = ?;";
+       return jdbcTemplate.queryForObject(sql, BigDecimal.class, userId);
+    }
+    public List<User> getListOfUsers(Long userId) {
+        List<User> userList = new ArrayList<>();
+        User currentUser = null;
+        String sql ="SELECT user_id, user_name From tenmo_user";
+        SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql);
+        while(rowSet.next()) {
+            currentUser = mapRowToUser(rowSet);
+            if(!currentUser.getId().equals(userId))
+                userList.add(currentUser);
+        }
+
+        return userList;
+    }
+
 
     private User mapRowToUser(SqlRowSet rs) {
         User user = new User();
