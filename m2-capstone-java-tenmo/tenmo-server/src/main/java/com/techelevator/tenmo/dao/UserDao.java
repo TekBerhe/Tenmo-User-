@@ -11,7 +11,7 @@ public interface UserDao {
 
     User findByUsername(String username);
 
-    int findIdByUsername(String username);
+    Long findIdByUsername(String username);
 
     BigDecimal getAccountBalance (int userId);
 

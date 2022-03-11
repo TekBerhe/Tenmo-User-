@@ -1,9 +1,6 @@
 package com.techelevator.tenmo.dao;
 
-import com.techelevator.tenmo.model.Account;
-import com.techelevator.tenmo.model.CompletedTransfer;
-import com.techelevator.tenmo.model.Transfer;
-import com.techelevator.tenmo.model.User;
+import com.techelevator.tenmo.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
@@ -18,6 +15,9 @@ public class JdbcTransferDao implements TransferDao{
     @Autowired
     private JdbcAccountDao jdbcAccountDao;
     private JdbcTemplate jdbcTemplate;
+    private JdbcRequestDao jdbcRequestDao;
+    @Autowired
+    private JdbcUserDao jdbcUserDao;
 
     public JdbcTransferDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -25,47 +25,47 @@ public class JdbcTransferDao implements TransferDao{
 
 
     @Override
-    public void logTransaction(Transfer sendMoney, Long senderAccountId, Long receiverAccountId) {
+    public void logTransaction(Request sendMoney, Long senderAccountId, Long receiverAccountId) {
         String logTransfer = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount) VALUES (?,?,?,?,?)";
         jdbcTemplate.update(
                 logTransfer,
-                sendMoney.getTransferTypeId(),
-                sendMoney.getTransferStatusId(),
+                sendMoney.getTransferType(),
+                sendMoney.getTransferStatus(),
                 senderAccountId,
                 receiverAccountId,
-                sendMoney.getTransferAmount()
+                sendMoney.getAmount()
         );
     }
 
     @Override
-    public String performSendTransfer(Transfer sendMoney) {
-
-        Account fromAccount = jdbcAccountDao.getAccountByUserId(sendMoney.getAccountIdFrom());
-        Account toAccount = jdbcAccountDao.getAccountByUserId(sendMoney.getAccountIdTo());
-        String s;
-        sendMoney.setTransferStatusId(2);
-        sendMoney.setTransferTypeId(2);
+    public void performSendTransfer(Request sendMoney) {
+        Long senderId = jdbcUserDao.findIdByUsername(sendMoney.getSenderName());
+        Long receiverId = jdbcUserDao.findIdByUsername(sendMoney.getReceiverName());
+        Account fromAccount = jdbcAccountDao.getAccountByUserId(senderId);
+        Account toAccount = jdbcAccountDao.getAccountByUserId(receiverId);
+        sendMoney.setTransferType(2L);
+        sendMoney.setTransferStatus(2L);
 
         //Logs rejected transaction
-        if (fromAccount.getBalance().compareTo(sendMoney.getTransferAmount())== -1){
-            sendMoney.setTransferStatusId(3);
+        if (fromAccount.getBalance().compareTo(sendMoney.getAmount())== -1){
+            sendMoney.setTransferStatus(3L);
             logTransaction(sendMoney, fromAccount.getAccountId(), toAccount.getAccountId());
-            return s = "There is not enough money in your account to make this transaction";
+
 
         } else {
 
             // Pulling Funds
             String senderSql = "UPDATE account SET balance = balance - ? WHERE account_id = ?;";
             String receiverSql = "UPDATE account SET balance = balance + ? WHERE account_id = ?;";
-            jdbcTemplate.update(senderSql, sendMoney.getTransferAmount(), fromAccount.getAccountId());
-            jdbcTemplate.update(receiverSql, sendMoney.getTransferAmount(), toAccount.getAccountId());
+            jdbcTemplate.update(senderSql, sendMoney.getAmount(), fromAccount.getAccountId());
+            jdbcTemplate.update(receiverSql, sendMoney.getAmount(), toAccount.getAccountId());
 
             //Logs completed transaction
             logTransaction(sendMoney, fromAccount.getAccountId(), toAccount.getAccountId());
 
         }
 
-        return s = "Transaction completed";
+
     }
 
     @Override
