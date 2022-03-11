@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class UserService {
+    ConsoleService consoleService = new ConsoleService();
     private String baseUrl = "http://localhost:8080";
     RestTemplate restTemplate = new RestTemplate();
     public UserService(String baseUrl){
@@ -26,4 +27,6 @@ public class UserService {
       User[] currentUser = restTemplate.exchange(baseUrl +  "tenmo_user", HttpMethod.GET, entity, User[].class).getBody();
       return Arrays.asList(currentUser);
     }
+
+
 }

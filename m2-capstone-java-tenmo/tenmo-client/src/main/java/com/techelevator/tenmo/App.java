@@ -114,9 +114,17 @@ public class App {
 	}
 
 	private void sendBucks() {
-		// TODO Auto-generated method stub
+
+        Long enteredId = null;
         Long userId = currentUser.getUser().getId();
 		consoleService.printUsers(userService.userList(currentUser),userId);
+        while (enteredId == null) {
+            enteredId = consoleService.promptForLong("Please enter the ID of the person you'd like to make this transaction with: ");
+            if (!enteredId.equals(userId)) {
+                consoleService.promptForBigDecimal("Please enter a transferable amount: ");
+                break;
+            } else System.out.println("You cannot send yourself money.");
+        }
 	}
 
 	private void requestBucks() {

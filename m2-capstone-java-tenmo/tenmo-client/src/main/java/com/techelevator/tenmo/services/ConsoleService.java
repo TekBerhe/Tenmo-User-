@@ -4,7 +4,9 @@ package com.techelevator.tenmo.services;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 
+import javax.naming.Name;
 import java.math.BigDecimal;
+import java.sql.SQLOutput;
 import java.util.List;
 import java.util.Scanner;
 
@@ -70,6 +72,17 @@ public class ConsoleService {
         }
     }
 
+    public Long promptForLong(String prompt) {
+        System.out.print(prompt);
+        while (true) {
+            try {
+                return Long.parseLong(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter the ID of the person you'd like to make this transaction with:");;
+            }
+        }
+    }
+
     public BigDecimal promptForBigDecimal(String prompt) {
         System.out.print(prompt);
         while (true) {
@@ -86,13 +99,18 @@ public class ConsoleService {
         scanner.nextLine();
     }
     public void printUsers(List<User> incomingList, Long logInId){
+        System.out.println("-----------------------------------------------");
+        System.out.println("Users");
+        System.out.print("ID");
+        System.out.println("          Name");
+        System.out.println("-----------------------------------------------");
         for(User currentUser : incomingList) {
             if(currentUser.getId() != logInId) {
-                System.out.println(currentUser.getId());
-                System.out.println(currentUser.getUsername());
+                System.out.println(currentUser.getId() + "        " + currentUser.getUsername());
             }
-            System.out.println("Please enter the user_name of the person you'd like to transfer funds to.");
         }
+        System.out.println("--------------------");
+
     }
 
     public void printErrorMessage() {
