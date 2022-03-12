@@ -1,22 +1,19 @@
 package com.techelevator.tenmo;
 
 
-import                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              com.techelevator.tenmo.model.AuthenticatedUser;
+import com.techelevator.tenmo.model.*;
 
-import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.AuthenticatedUser;
-import com.techelevator.tenmo.model.UserCredentials;
-import com.techelevator.tenmo.services.AccountService;
-import com.techelevator.tenmo.services.AuthenticationService;
-import com.techelevator.tenmo.services.ConsoleService;
-import com.techelevator.tenmo.services.UserService;
+import com.techelevator.tenmo.services.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class App {
 
     private static final String API_BASE_URL = "http://localhost:8080/";
 
+    private final RequestService requestService = new RequestService(API_BASE_URL);
     private final ConsoleService consoleService = new ConsoleService();
     private final AccountService accountService = new AccountService(API_BASE_URL);
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
@@ -114,17 +111,27 @@ public class App {
 	}
 
 	private void sendBucks() {
-
+        BigDecimal amount = null;
         Long enteredId = null;
         Long userId = currentUser.getUser().getId();
 		consoleService.printUsers(userService.userList(currentUser),userId);
         while (enteredId == null) {
             enteredId = consoleService.promptForLong("Please enter the ID of the person you'd like to make this transaction with: ");
             if (!enteredId.equals(userId)) {
-                consoleService.promptForBigDecimal("Please enter a transferable amount: ");
+              amount =  consoleService.promptForBigDecimal("Please enter a transferable amount: ");
                 break;
             } else System.out.println("You cannot send yourself money.");
         }
+
+        String receivingUser = "";
+        List<User> userList = userService.userList(currentUser);
+        for (User currentUser : userList){
+            if (currentUser.getId().equals(enteredId)) {
+                receivingUser = currentUser.getUsername();
+            } else consoleService.printMainMenu();
+        }
+
+        requestService.sendMoneyRequest(currentUser, receivingUser, amount);
 	}
 
 	private void requestBucks() {

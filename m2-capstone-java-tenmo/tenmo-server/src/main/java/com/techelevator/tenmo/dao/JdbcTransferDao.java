@@ -45,6 +45,7 @@ public class JdbcTransferDao implements TransferDao{
         Account toAccount = jdbcAccountDao.getAccountByUserId(receiverId);
         sendMoney.setTransferType(2L);
         sendMoney.setTransferStatus(2L);
+        BigDecimal zero = BigDecimal.valueOf(0);
 
         //Logs rejected transaction
         if (fromAccount.getBalance().compareTo(sendMoney.getAmount())== -1){
@@ -52,8 +53,15 @@ public class JdbcTransferDao implements TransferDao{
             logTransaction(sendMoney, fromAccount.getAccountId(), toAccount.getAccountId());
 
 
-        } else {
+        } else if (sendMoney.getAmount() == zero) {
+            sendMoney.setTransferStatus(3L);
+            logTransaction(sendMoney, fromAccount.getAccountId(), toAccount.getAccountId());
 
+        } else if(sendMoney.getAmount().compareTo(BigDecimal.valueOf(0)) == -1) {
+            sendMoney.setTransferStatus(3L);
+            logTransaction(sendMoney, fromAccount.getAccountId(), toAccount.getAccountId());
+        }else {
+            
             // Pulling Funds
             String senderSql = "UPDATE account SET balance = balance - ? WHERE account_id = ?;";
             String receiverSql = "UPDATE account SET balance = balance + ? WHERE account_id = ?;";
