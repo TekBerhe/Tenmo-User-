@@ -8,4 +8,6 @@ import java.util.List;
 public interface RequestDao {
     String performSendTransfer(Request sendMoney);
 
+    List<Request> listOfTransactionsById (Long userId);
+
 }

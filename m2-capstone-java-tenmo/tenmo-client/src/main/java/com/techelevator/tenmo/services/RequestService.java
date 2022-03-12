@@ -12,6 +12,8 @@ import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class RequestService {
@@ -31,6 +33,7 @@ public class RequestService {
         headers.setBearerAuth(user.getToken());
         HttpEntity<Request> entity = new HttpEntity<Request>(currentRequest, headers);
 
+        currentRequest.setTransactionId(null);
         currentRequest.setSenderName(user.getUser().getUsername());
         currentRequest.setReceiverName(receivingUser);
         currentRequest.setAmount(amount);
@@ -43,4 +46,24 @@ public class RequestService {
             System.out.println("Cannot perform transaction at this time");
         }
     }
+
+
+    public List<Request> getListOfTransactions (AuthenticatedUser user){
+        Request[] list = null;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(user.getToken());
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
+
+        try {
+           list = restTemplate.exchange(baseUrl + "account/transfer/history", HttpMethod.GET, entity, Request[].class).getBody();
+        } catch (RestClientResponseException e) {
+            System.out.println("Cannot perform this action at this time.");
+        }
+
+        return Arrays.asList(list);
+
+    }
+
+
 }

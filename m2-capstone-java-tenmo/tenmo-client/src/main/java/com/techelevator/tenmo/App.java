@@ -101,9 +101,27 @@ public class App {
 
 
 	private void viewTransferHistory() {
-		// TODO Auto-generated method stub
-		
+		List<Request> transactionList = requestService.getListOfTransactions(currentUser);
+        consoleService.printTransactions(transactionList);
+        Long id = consoleService.promptForLong("Please enter the transfer ID to view details (enter 0 to return to menu): ");
+        if (id == 0){
+            mainMenu();
+        } else viewTransactionDetails(transactionList, id);
 	}
+
+    private void viewTransactionDetails(List<Request> list, Long id){
+        for (Request currentRequest : list){
+            if (currentRequest.getTransactionId().equals(id)){
+                consoleService.printTransactionDetails(currentRequest);
+            }
+        }
+        System.out.println();
+        Long prompt = consoleService.promptForLong("Enter 0 to return to the main menu: ");
+            while (prompt != 0){
+                prompt = consoleService.promptForLong("Enter 0 to return to the main menu: ");
+            }
+            mainMenu();
+    }
 
 	private void viewPendingRequests() {
 		// TODO Auto-generated method stub

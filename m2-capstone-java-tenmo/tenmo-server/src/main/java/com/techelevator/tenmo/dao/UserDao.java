@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface UserDao {
 
+    String findUsernameByAccountId (Long accountId);
+
     List<User> findAll();
 
     User findByUsername(String username);

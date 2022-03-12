@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 
 public class Request {
 
+    private Long transactionId;
     private String senderName;
     private String receiverName;
     private BigDecimal amount;
@@ -12,7 +13,10 @@ public class Request {
 
     public Request(){}
 
-    public Request(String senderName, String receiverName, BigDecimal amount, Long transferType, Long transferId) {
+
+
+    public Request(String senderName, String receiverName, BigDecimal amount, Long transferType, Long transferId, Long transactionId) {
+        this.transactionId = transactionId;
         this.senderName = senderName;
         this.receiverName = receiverName;
         this.amount = amount;
@@ -58,6 +62,14 @@ public class Request {
 
     public void setTransferStatus(Long transferStatus) {
         this.transferStatus = transferStatus;
+    }
+
+    public Long getTransactionId() {
+        return transactionId;
+    }
+
+    public void setTransactionId(Long transactionId) {
+        this.transactionId = transactionId;
     }
 
 }

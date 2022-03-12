@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface TransferDao {
 
+    public List<Transfer> listOfTransactionsById(Long accountId);
+
     void logTransaction(Request sendMoney, Long senderAccountId, Long receiverAccountId);
 
     void performSendTransfer(Request sendMoney);

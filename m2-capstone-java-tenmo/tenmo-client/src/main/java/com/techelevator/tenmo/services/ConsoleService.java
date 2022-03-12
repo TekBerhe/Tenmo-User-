@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.services;
 
 
+import com.techelevator.tenmo.model.Request;
 import com.techelevator.tenmo.model.User;
 import com.techelevator.tenmo.model.UserCredentials;
 
@@ -37,6 +38,37 @@ public class ConsoleService {
         System.out.println("2: Login");
         System.out.println("0: Exit");
         System.out.println();
+    }
+
+
+    public void printTransactionDetails(Request request) {
+        String transactionType = null;
+        String transactionStatus = null;
+
+        if(request.getTransferType() == 1){
+            transactionType = "Request";
+        } else if (request.getTransferType() == 2){
+            transactionType = "Send";
+        }
+
+        if(request.getTransferStatus() == 1){
+            transactionStatus = "Pending";
+        } else if(request.getTransferStatus() == 2){
+            transactionStatus = "Approved";
+        }else if(request.getTransferStatus() == 3){
+            transactionStatus = "Rejected";
+        }
+
+        System.out.println();
+        System.out.println("-------------------------------------------");
+        System.out.println(" Transfer Details              ");
+        System.out.println("-------------------------------------------");
+        System.out.println(" ID: " + request.getTransactionId());
+        System.out.println(" From: " + request.getSenderName());
+        System.out.println(" To: " + request.getReceiverName());
+        System.out.println(" Type: " + transactionType);
+        System.out.println(" Status: " + request.getTransactionId());
+        System.out.println(" Amount: $" + request.getAmount());
     }
 
     public void printMainMenu() {
@@ -111,6 +143,21 @@ public class ConsoleService {
         }
         System.out.println("--------------------");
 
+    }
+
+    public void printTransactions (List<Request> incomingList) {
+        System.out.println("-----------------------------------------------");
+        System.out.println("Transfers");
+        System.out.print("ID");
+        System.out.println("          From/To           Amount");
+        System.out.println("-----------------------------------------------");
+        for(Request currentRequest : incomingList) {
+
+            System.out.println(currentRequest.getTransactionId() + "        To: " + currentRequest.getReceiverName() +
+                    "          $" + currentRequest.getAmount());
+
+        }
+        System.out.println("--------------------");
     }
 
     public void printErrorMessage() {

@@ -7,6 +7,7 @@ import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -21,6 +22,23 @@ public class JdbcTransferDao implements TransferDao{
 
     public JdbcTransferDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+
+    @Override
+    public List<Transfer> listOfTransactionsById(Long accountId) {
+
+            List<Transfer> userTransactionList = new ArrayList<>();
+
+            String sql = "SELECT transfer_id, transfer_type_id, transfer_status_id, account_from, account_to, amount " +
+                    "FROM transfer " +
+                    "WHERE account_from = ?;";
+            SqlRowSet rowSet = jdbcTemplate.queryForRowSet(sql, accountId);
+            while (rowSet.next()){
+                Transfer transfer = mapToTransfer(rowSet);
+                userTransactionList.add(transfer);
+            }
+            return userTransactionList;
     }
 
 
@@ -61,7 +79,7 @@ public class JdbcTransferDao implements TransferDao{
             sendMoney.setTransferStatus(3L);
             logTransaction(sendMoney, fromAccount.getAccountId(), toAccount.getAccountId());
         }else {
-            
+
             // Pulling Funds
             String senderSql = "UPDATE account SET balance = balance - ? WHERE account_id = ?;";
             String receiverSql = "UPDATE account SET balance = balance + ? WHERE account_id = ?;";
@@ -72,6 +90,8 @@ public class JdbcTransferDao implements TransferDao{
             logTransaction(sendMoney, fromAccount.getAccountId(), toAccount.getAccountId());
 
         }
+
+
 
 
     }
@@ -88,8 +108,8 @@ public class JdbcTransferDao implements TransferDao{
         transfer.setAccountIdFrom(rowSet.getLong("account_from"));
         transfer.setAccountIdTo(rowSet.getLong("account_to"));
         transfer.setTransferAmount(rowSet.getBigDecimal("amount"));
-        transfer.setTransferStatusId(rowSet.getInt("transfer_status_id"));
-        transfer.setTransferTypeId(rowSet.getInt("transfer_type_id"));
+        transfer.setTransferStatusId(rowSet.getLong("transfer_status_id"));
+        transfer.setTransferTypeId(rowSet.getLong("transfer_type_id"));
         transfer.setTransferId(rowSet.getLong("transfer_id"));
 
 
